@@ -9,11 +9,17 @@
         body {
             font-family: Arial, sans-serif;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
             background-color: #f0f0f0;
+        }
+        .header {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
         }
         .container {
             text-align: center;
@@ -21,37 +27,104 @@
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
         }
-        #datetime {
-            font-size: 24px;
-            font-weight: bold;
-            color: #333;
+        .date-info {
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .buttons button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: #fff;
+        }
+        .buttons button:hover {
+            background-color: #0056b3;
+        }
+        .additional-info {
+            font-size: 16px;
+            color: #555;
         }
     </style>
 </head>
 <body>
+    <div class="header">
+        Текущая дата и время: <span id="current-datetime"></span>
+    </div>
     <div class="container">
-        <h1>Текущая дата и время</h1>
-        <div id="datetime">Загрузка...</div>
+        <div class="date-info">
+            <div>День: <span id="day"></span></div>
+            <div>Месяц: <span id="month"></span></div>
+            <div>Год: <span id="year"></span></div>
+        </div>
+        <div class="buttons">
+            <button id="prev-day">← Вчера</button>
+            <button id="next-day">Завтра →</button>
+        </div>
+        <div class="additional-info">
+            <p>Здесь будет дополнительная информация для выбранной даты.</p>
+        </div>
     </div>
 
     <script>
         // Инициализация Telegram Web App
         const tg = window.Telegram.WebApp;
 
-        // Функция для обновления даты и времени
+        // Текущая дата
+        let currentDate = new Date();
+
+        // Функция для обновления текущей даты и времени
         function updateDateTime() {
+            const datetimeElement = document.getElementById('current-datetime');
             const now = new Date();
-            const datetimeElement = document.getElementById('datetime');
-            datetimeElement.textContent = now.toLocaleString();
+            datetimeElement.textContent = now.toLocaleString('ru-RU', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+                hour: 'numeric',
+                minute: 'numeric',
+                second: 'numeric'
+            });
         }
+
+        // Функция для обновления отображаемой даты (день, месяц, год)
+        function updateDate() {
+            const dayElement = document.getElementById('day');
+            const monthElement = document.getElementById('month');
+            const yearElement = document.getElementById('year');
+
+            // Отображаем день, месяц и год
+            dayElement.textContent = currentDate.getDate();
+            monthElement.textContent = currentDate.toLocaleString('ru-RU', { month: 'long' });
+            yearElement.textContent = currentDate.getFullYear();
+        }
+
+        // Функция для изменения даты (добавление или вычитание дней)
+        function changeDate(days) {
+            currentDate.setDate(currentDate.getDate() + days);
+            updateDate();
+        }
+
+        // Обработчики кнопок
+        document.getElementById('prev-day').addEventListener('click', () => changeDate(-1));
+        document.getElementById('next-day').addEventListener('click', () => changeDate(1));
 
         // Обновляем дату и время каждую секунду
         setInterval(updateDateTime, 1000);
 
         // Инициализация приложения
         tg.ready();
-        updateDateTime(); // Первоначальное обновление
+        updateDateTime(); // Первоначальное обновление даты и времени
+        updateDate();     // Первоначальное обновление даты
     </script>
 </body>
 </html>
